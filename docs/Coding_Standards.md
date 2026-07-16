@@ -17,8 +17,24 @@ Dokumen ini adalah acuan wajib untuk seluruh kode yang ditulis di project ini, b
 - Nama package = nama folder fitur.
 
 ### File
-- `snake_case.go` — contoh: `product_usecase.go`, `product_repository.go`.
-- File test selalu `_test.go` di folder yang sama dengan yang diuji.
+
+**Prinsip: 1 method/operation = 1 file** di semua layer (handler, usecase, repository).
+
+- Format nama file: `snake_case.go` dengan nama operasi sebagai nama file — contoh: `get_product.go`, `create_product.go`, `list_product.go`.
+- File test selalu `<nama_file>_test.go` di folder yang sama dengan file yang ditest. Contoh: `create_product.go` → `create_product_test.go`.
+- **File khusus yang namanya sudah ditetapkan** (tidak boleh dipakai untuk method):
+
+| File | Layer | Isi |
+|---|---|---|
+| `handler.go` | `delivery/http` | HANYA struct handler + constructor |
+| `usecase.go` | `usecase` | HANYA struct usecase + constructor |
+| `repository.go` | `repository` | HANYA struct repository + constructor |
+| `interface.go` | `usecase`, `repository` | Definisi interface yang dipakai layer di atasnya |
+| `dto.go` | `delivery/http` | Semua request & response DTO (digabung satu file per fitur) |
+| `route.go` | `delivery/http` | Registrasi semua route milik fitur ini |
+| `contract.go` | root fitur | Interface yang di-expose ke fitur lain |
+| `product.go` | `entity` | Domain model (sesuai nama fitur) |
+
 
 ### Variable & Function
 - `camelCase` untuk unexported, `PascalCase` untuk exported.

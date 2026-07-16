@@ -19,11 +19,16 @@ Dokumen ini adalah instruksi wajib untuk AI assistant (Claude, Copilot, Cursor, 
 ## 2. Saat Membuat Fitur Baru
 
 1. Ikuti struktur folder fitur yang sudah ada persis: `delivery/http`, `usecase`, `repository`, `entity`, `contract.go`.
-2. Jangan langsung import struct/repository dari fitur lain — buat interface di `contract.go` fitur yang membutuhkan (lihat aturan komunikasi antar fitur di `ARCHITECTURE.md`).
-3. Setiap handler baru yang expose ke publik **wajib** disertai Swagger annotation lengkap (lihat contoh di `CODING_STANDARDS.md` bagian 7).
-4. Setiap usecase baru **wajib** disertai unit test dengan mock repository, minimal untuk skenario sukses dan skenario error utama.
-5. Semua endpoint baru wajib mengikuti standard response format (`shared/response`) — jangan buat format response custom per endpoint.
-6. Semua query database yang menyentuh data toko wajib di-scope dengan `store_id` dari JWT claim — tidak ada pengecualian.
+2. **1 method/operation = 1 file** di semua layer. Jangan gabungkan semua handler dalam satu `handler.go`, semua usecase dalam satu `product_usecase.go`, atau semua repository dalam satu `product_repository.go`.
+   - Buat file per operasi: `get_product.go`, `create_product.go`, `list_product.go`, dst.
+   - File yang namanya sudah ditetapkan (`handler.go`, `usecase.go`, `repository.go`, `interface.go`, `dto.go`, `route.go`) hanya boleh berisi struct, constructor, interface definition, atau registrasi route — bukan method bisnis.
+   - Setiap file operation wajib disertai file test-nya: `create_product.go` → `create_product_test.go`.
+3. Jangan langsung import struct/repository dari fitur lain — buat interface di `contract.go` fitur yang membutuhkan (lihat aturan komunikasi antar fitur di `ARCHITECTURE.md`).
+4. Setiap handler baru yang expose ke publik **wajib** disertai Swagger annotation lengkap (lihat contoh di `CODING_STANDARDS.md` bagian 9).
+5. Setiap usecase baru **wajib** disertai unit test dengan mock repository, minimal untuk skenario sukses dan skenario error utama.
+6. Semua endpoint baru wajib mengikuti standard response format (`shared/response`) — jangan buat format response custom per endpoint.
+7. Semua query database yang menyentuh data toko wajib di-scope dengan `store_id` dari JWT claim — tidak ada pengecualian.
+
 
 ## 3. Saat Mengubah Kode yang Sudah Ada
 
