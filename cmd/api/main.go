@@ -76,7 +76,9 @@ func main() {
 	// Global middleware
 	r.Use(gin.Recovery())
 	r.Use(middleware.RequestLogger())
+	r.Use(middleware.PrometheusMetrics())
 	r.Use(middleware.CORS([]string{"*"})) // TODO: replace "*" with actual client origins in production
+
 
 	// Health check — no auth required
 	r.GET("/health", func(c *gin.Context) {

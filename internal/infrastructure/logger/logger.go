@@ -18,16 +18,37 @@ import (
 func Init(appName, env string) {
 	zerolog.TimeFieldFormat = time.RFC3339
 
+	// Ensure logs directory exists
+	_ = os.MkdirAll("logs", 0755)
+
+	logFile, err := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil && env != "test" {
+		log.Warn().Err(err).Msg("failed to open log file, falling back to stdout only")
+	}
+
 	if env == "development" {
-		// Pretty-print for local development
-		log.Logger = log.Output(zerolog.ConsoleWriter{
+		// Pretty-print for local development on stdout
+		consoleWriter := zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			TimeFormat: "15:04:05",
-		}).With().
+		}
+
+		var multi zerolog.LevelWriter
+		if logFile != nil {
+			// Write JSON to file for Promtail, and pretty to console
+			multi = zerolog.MultiLevelWriter(consoleWriter, logFile)
+		} else {
+			multi = zerolog.MultiLevelWriter(consoleWriter)
+		}
+
+		log.Logger = zerolog.New(multi).With().
+			Timestamp().
 			Str("service", appName).
+			Str("env", env).
 			Logger()
 		return
 	}
+
 
 	// Production: structured JSON output
 	log.Logger = zerolog.New(os.Stdout).
