@@ -4,13 +4,17 @@ BIN_PATH  := ./bin/$(APP_NAME)
 MIGRATION_DIR := ./migrations
 DB_URL    ?= $(shell grep ^DB_URL .env | cut -d '=' -f2-)
 
-.PHONY: all run build test lint swagger \
-        migrate-up migrate-down migrate-create \
-        docker-up docker-down clean
+.PHONY: all dev run build test lint swagger \
+        migrate-up migrate-down migrate-create migrate-force \
+        docker-up docker-down docker-logs clean help
 
 # ── Development ────────────────────────────────────────────────────────────────
 
-## run: start the application (reads .env automatically via godotenv)
+## dev: [LOCAL] generate swagger + apply migrations + start server (all-in-one)
+## NOTE: Gunakan ini saat local dev. Jangan dipakai di production/CI — gunakan "make run".
+dev: swagger migrate-up run
+
+## run: start the application only (reads .env via godotenv)
 run:
 	go run $(CMD_PATH)/main.go
 
@@ -33,8 +37,10 @@ lint:
 
 ## swagger: regenerate Swagger documentation from code annotations
 swagger:
+	@which swag > /dev/null 2>&1 || \
+		(echo "❌ swag CLI not found. Install: go install github.com/swaggo/swag/cmd/swag@latest" && exit 1)
 	swag init -g cmd/api/main.go -o ./docs --parseDependency --parseInternal
-	@echo "Swagger docs generated at ./docs"
+	@echo "✅ Swagger docs generated at ./docs"
 
 # ── Migration ──────────────────────────────────────────────────────────────────
 
