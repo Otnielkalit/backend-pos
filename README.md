@@ -136,17 +136,28 @@ make migrate-up
 
 ## Menjalankan Aplikasi
 
+### Local Development (Recommended)
+
 ```bash
-make run
+make dev
 ```
 
-Atau langsung dengan Go:
+`make dev` menjalankan tiga langkah sekaligus:
+1. **`make swagger`** — generate ulang Swagger docs dari annotation
+2. **`make migrate-up`** — apply semua pending migration
+3. **`make run`** — start server
+
+### Hanya Start Server (tanpa migrate/swagger)
 
 ```bash
+make run
+# atau langsung:
 go run cmd/api/main.go
 ```
 
-Server akan berjalan di `http://localhost:8080`.
+> ⚠️ Gunakan `make run` (bukan `make dev`) di production/staging — migration tidak boleh jalan otomatis tanpa review.
+
+Server berjalan di `http://localhost:8080`.
 
 ---
 
@@ -195,21 +206,28 @@ http://localhost:3000
 ## Perintah Umum (Makefile)
 
 ```bash
-make run              # Jalankan aplikasi
+# ── Local Development ───────────────────────────────────────────
+make dev              # [LOCAL] swagger + migrate-up + run (all-in-one)
+
+# ── Individual Commands ─────────────────────────────────────────
+make run              # Start server saja (untuk production/CI)
 make build            # Build binary ke ./bin/
 make test             # Jalankan semua unit test + coverage report
 make lint             # Jalankan golangci-lint
 make swagger          # Generate/update Swagger docs dari annotation
 
+# ── Migration ───────────────────────────────────────────────────
 make migrate-up       # Apply semua pending migration
 make migrate-down     # Rollback 1 migration terakhir
 make migrate-create name=<nama>   # Buat file migration baru
 make migrate-force version=<ver>  # Force migration version (jika dirty)
 
-make docker-up        # Start semua Docker services (background)
-make docker-down      # Stop semua Docker services
+# ── Docker ──────────────────────────────────────────────────────
+make docker-up        # Start semua services (Postgres, Redis, Grafana)
+make docker-down      # Stop semua services
 make docker-logs      # Follow log semua services
 
+# ── Utilities ───────────────────────────────────────────────────
 make clean            # Hapus binary dan coverage report
 make help             # Tampilkan semua perintah yang tersedia
 ```
