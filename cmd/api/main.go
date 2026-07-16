@@ -16,6 +16,7 @@ import (
 	"github.com/Otnielkalit/backend-pos/internal/infrastructure/logger"
 	"github.com/Otnielkalit/backend-pos/internal/shared/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 )
 
@@ -81,6 +82,11 @@ func main() {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+
+	// Prometheus metrics — scraped by Prometheus every 15s (see observability/prometheus/prometheus.yml)
+	// Exposes default Go runtime metrics: goroutines, GC, memory, HTTP request stats, etc.
+	// No auth required — restrict access at network/firewall level in production.
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	// API v1 routes
 	v1 := r.Group("/api/v1")
