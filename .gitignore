@@ -1,3 +1,7 @@
+# Internal documentation (architecture, coding standards, AI rules)
+# These are team-internal docs, not public-facing
+docs/
+
 # Binaries
 *.exe
 *.exe~
