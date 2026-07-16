@@ -1,0 +1,43 @@
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  govet:
+    enable-all: true
+  staticcheck:
+    checks: ["all"]
+  goimports:
+    local-prefixes: github.com/Otnielkalit/backend-pos
+  gofmt:
+    simplify: true
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+
+linters:
+  disable-all: true
+  enable:
+    - govet        # Reports suspicious code constructs
+    - errcheck     # Checks for unchecked errors
+    - staticcheck  # Go static analysis
+    - unused       # Checks for unused code
+    - goimports    # Ensures imports are formatted and grouped
+    - gofmt        # Go formatting
+    - revive       # Drop-in replacement for golint
+    - gocritic     # Various checks
+    - gosec        # Security checks
+
+issues:
+  exclude-rules:
+    # Ignore errors in test files for some linters
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+run:
+  timeout: 5m
+  tests: true
