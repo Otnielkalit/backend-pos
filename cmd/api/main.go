@@ -18,6 +18,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
+
+	_ "github.com/Otnielkalit/backend-pos/docs" // Required for swaggo
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title           POS Inventory Backend API
@@ -84,6 +88,9 @@ func main() {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+
+	// Swagger documentation
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Prometheus metrics — scraped by Prometheus every 15s (see observability/prometheus/prometheus.yml)
 	// Exposes default Go runtime metrics: goroutines, GC, memory, HTTP request stats, etc.
